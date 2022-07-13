@@ -6,10 +6,16 @@ try:
     import requests
     from bs4 import BeautifulSoup
 except ModuleNotFoundError:
-    system('pip install -r requirements.txt')
-    import aspose.words as aw
-    import requests
-    from bs4 import BeautifulSoup
+    if path.isfile('requirements.txt'):
+        system('pip install -r requirements.txt')
+        import aspose.words as aw
+        import requests
+        from bs4 import BeautifulSoup
+    else:
+        print("There are not enough dependencies to run the module.\n"
+              "Please download the requirements.txt file from:\n"
+              "https://github.com/Allen-Avanheim/softformance_3/blob/master/requirements.txt")
+        exit()
 
 
 class WebCrawler:
@@ -69,17 +75,14 @@ class WebCrawler:
         urls = []
         sources = ('src', 'data-src', 'data-srcset')
         for img in image_tags:
-            counter = 0
-            while counter < 3:
+            for source in sources:
                 try:
-                    if counter == 2:
-                        urls.extend(img[sources[counter]].split(','))
+                    if source == 'data-srcset':
+                        urls.extend(img[source].split(','))
                     else:
-                        urls.append(img[sources[counter]])
+                        urls.append(img[source])
                 except KeyError:
                     pass
-                finally:
-                    counter += 1
         return tuple(urls)
 
     @staticmethod
